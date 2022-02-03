@@ -43,12 +43,11 @@ def plot_target_distribution(dataset):
 def fail_percentage_negative_values(dataset, col_name):
     negative_subset = dataset[dataset[col_name] < 0]
     aggregate_negative_subset = negative_subset.groupby(['d_id']).mean()
-    fail_percentage_subset = np.round(aggregate_negative_subset['fail'].sum() / aggregate_negative_subset.shape[0], 3)
-    print('The failures percentage among negative values of feature ' + col_name + ' is: ' + str(fail_percentage_subset))
+    fail_percentage_subset = aggregate_negative_subset['fail'].sum()
+    #print('The failures percentage among negative values of feature ' + col_name + ' is: ' + str(fail_percentage_subset))
     disks_id_without_fail_with_negative = negative_subset[negative_subset['fail'] == 0]['d_id'].unique()
-    print('The number of disks without failures but with negative values of feature ' + col_name + ' is: ' + str(
-        disks_id_without_fail_with_negative.size))
-    return disks_id_without_fail_with_negative.tolist()
+    # print('The number of disks without failures but with negative values of feature ' + col_name + ' is: ' + str(disks_id_without_fail_with_negative.size))
+    return disks_id_without_fail_with_negative.tolist(), fail_percentage_subset
 
 
 def replace_negative_vals_average(dataset, col_name):
@@ -92,7 +91,8 @@ def plot_relation_numeric_to_target(data, col_name):
 
 
 def plot_relation_categorical_to_target(data, col_name):
-    sns.catplot(x=col_name, hue='fail', data=data, kind='count', legend=False)
+    hue_name = 'fail'
+    sns.catplot(x=col_name, hue=hue_name, data=data, kind='count', legend=False)
     plt.title('The relationship between failure and ' + col_name)
     plt.legend(['Non-failed', 'Failed'], bbox_to_anchor=(1.0, 1.0))
     plt.show()
@@ -142,7 +142,7 @@ def fit_mode(model, X_train, y_train, X_test):
     return y_pred_test, y_pred_train, y_pred_probs
 
 
-def evaluation(model, y_train, y_pred_train, y_test, y_pred_test, y_pred_probs):
+def evaluation(y_train, y_pred_train, y_test, y_pred_test, y_pred_probs):
     print('** Train evaluation **')
     print('The f1 score is ' + str(np.round(f1_score(y_train, y_pred_train), 2)))
     print('The Recall score is ' + str(np.round(recall_score(y_train, y_pred_train), 2)))
@@ -165,13 +165,6 @@ def evaluation(model, y_train, y_pred_train, y_test, y_pred_test, y_pred_probs):
     ax.set_title('The Precision-Recall Curve')
     ax.set_ylabel('Precision')
     ax.set_xlabel('Recall')
-    plt.show()
-
-    # confusion matrix
-    cm = confusion_matrix(y_test, y_pred_test, labels=model.classes_, normalize='true')
-    disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=model.classes_)
-    disp.plot()
-    plt.title('The confusion matrix')
     plt.show()
 
 
