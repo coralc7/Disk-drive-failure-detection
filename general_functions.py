@@ -145,17 +145,13 @@ def fit_mode(model, X_train, y_train, X_test):
 def evaluation(y_train, y_pred_train, y_test, y_pred_test, y_pred_probs):
     print('** Train evaluation **')
     print('The f1 score is ' + str(np.round(f1_score(y_train, y_pred_train), 2)))
-    print('The Recall score is ' + str(np.round(recall_score(y_train, y_pred_train), 2)))
-    print('The precision score is ' + str(np.round(precision_score(y_train, y_pred_train), 2)))
-
+    print(classification_report(y_train, y_pred_train))
+    print('\n')
     print('** Test evaluation **')
     print('The f1 score is ' + str(np.round(f1_score(y_test, y_pred_test), 2)))
-    print('The Recall score is ' + str(np.round(recall_score(y_test, y_pred_test), 2)))
-    print('The precision score is ' + str(np.round(precision_score(y_test, y_pred_test), 2)))
     # metrics for each class
     print(classification_report(y_test, y_pred_test))
     # Precision-Recall Curve
-    y_pred_probs
     precision, recall, thresholds = precision_recall_curve(y_test, y_pred_probs)
     # calculate precision-recall AUC
     auc_model = auc(recall, precision)
